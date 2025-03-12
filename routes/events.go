@@ -10,6 +10,13 @@ import (
 )
 
 func getEvents(context *gin.Context) {
+	token := context.Request.Header.Get("Authorization")
+
+	if token == "" {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Failed to authenticate user"})
+		return
+	}
+
 	events, err := models.GetAllEvent()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch events"})
