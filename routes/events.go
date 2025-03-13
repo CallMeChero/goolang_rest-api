@@ -2,6 +2,7 @@ package routes
 
 import (
 	"example/rest-api/models"
+	"example/rest-api/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -13,7 +14,13 @@ func getEvents(context *gin.Context) {
 	token := context.Request.Header.Get("Authorization")
 
 	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Failed to authenticate user"})
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized"})
+		return
+	}
+
+	err := utils.VerifyToken(token)
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized"})
 		return
 	}
 
