@@ -2,7 +2,6 @@ package routes
 
 import (
 	"example/rest-api/models"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -61,9 +60,17 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEvent(eventId)
+	event, err := models.GetEvent(eventId)
+
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to find ID"})
+		return
+	}
+
+	userId := context.GetInt64("userId")
+
+	if event.UserID != userId {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Only user that created event can edit it"})
 		return
 	}
 
@@ -73,7 +80,7 @@ func updateEvent(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
 		return
 	}
-	fmt.Println(updatedEvent)
+
 	updatedEvent.ID = eventId
 	err = updatedEvent.Update()
 	if err != nil {
@@ -93,6 +100,13 @@ func deleteEvent(context *gin.Context) {
 	event, err := models.GetEvent(eventId)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to find ID"})
+		return
+	}
+
+	userId := context.GetInt64("userId")
+
+	if event.UserID != userId {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Only user that created event can delete it"})
 		return
 	}
 

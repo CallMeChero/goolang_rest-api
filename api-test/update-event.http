@@ -1,5 +1,6 @@
 PUT http://localhost:8080/events/3
 content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhdmlkLmNlcmFuaWMrM0BnbWFpbC5jb20iLCJleHAiOjE3NDE5NjIyMTMsInVzZXJJZCI6M30.ITpatBIWSI-V3GdSMZd9ELky8C-ntiby826DMomUlQw 
 
 {
     "name": "Completely new event",
