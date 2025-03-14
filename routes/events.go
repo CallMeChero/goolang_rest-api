@@ -2,7 +2,6 @@ package routes
 
 import (
 	"example/rest-api/models"
-	"example/rest-api/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,19 +10,6 @@ import (
 )
 
 func getEvents(context *gin.Context) {
-	token := context.Request.Header.Get("Authorization")
-
-	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized"})
-		return
-	}
-
-	_, err := utils.VerifyToken(token)
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized"})
-		return
-	}
-
 	events, err := models.GetAllEvent()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch events"})
@@ -47,27 +33,15 @@ func getEvent(context *gin.Context) {
 }
 
 func createEvent(context *gin.Context) {
-	token := context.Request.Header.Get("Authorization")
-
-	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized"})
-		return
-	}
-
-	userId, err := utils.VerifyToken(token)
-
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized"})
-		return
-	}
-
 	var event models.Event
-	err = context.ShouldBindJSON(&event)
+	err := context.ShouldBindJSON(&event)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
 		return
 	}
+
+	userId := context.GetInt64("userId")
 
 	event.UserID = userId
 	err = event.Save()
